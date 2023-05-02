@@ -3,15 +3,10 @@ import mongoose from 'mongoose'
 const userSchema = mongoose.Schema(
     {
         login: {
-            type: String,
-            require: true,
-            min: 1,
-            max: 20
+            type: String
         },
         password: {
-            type: String,
-            required: true,
-            min: 6
+            type: String
         }
     },
     { timestamps: true } //createdAt,updatedAt

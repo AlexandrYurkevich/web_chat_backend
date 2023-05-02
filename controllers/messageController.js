@@ -23,4 +23,19 @@ export const sendMessage = async (req,res)=>{
     } catch (error) { console.log(error.message) }
 }
 
+export const deleteMessage = async (req,res)=>{
+    try {
+        const del = await Message.findByIdAndDelete(req.query.id);
+        res.status(200).json(del);
+    } catch (error) { console.log(error.message) }
+}
+
+export const updateMessage = async (req,res)=>{
+    try {
+        const message = req.body;
+        const update = await Message.findByIdAndUpdate({_id: message._id}, {text: message.text}, {new: true });
+        res.status(200).json(update);
+    } catch (error) { console.log(error.message) }
+}
+
 export default router;

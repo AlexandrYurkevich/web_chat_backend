@@ -18,25 +18,23 @@ app.use('/messages', mesRoutes);
 app.use('/auth', authRoutes);
 app.use("/users", userRoutes);
 
-const connection = process.env.mongoUri
 const serverPort = process.env.serverPort || 3001
 const socketPort = process.env.socketPort || 3002
-mongoose.connect(connection, { useNewUrlParser: true, useUnifiedTopology: true })
+
+mongoose.connect(process.env.mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
-    app.listen(serverPort, () => console.log(`Server Running on Port: http://localhost:${serverPort}`))
+    app.listen(serverPort, () => console.log(`MongoAtlas - Server Running on Port: http://localhost:${serverPort}`))
   })
-  .catch((error) => console.log(`${error} did not connect`));
+  .catch((error) => {
+    console.log(`${error} did not connect`)
+    mongoose.connect(process.env.homeUri, { useNewUrlParser: true, useUnifiedTopology: true })
+      .then(() => {
+        app.listen(serverPort, () => console.log(`Home MongoServer - Server Running on Port: http://localhost:${serverPort}`))
+      })
+      .catch((error) => console.log(`${error} did not connect`));
+  });
 
 
-// import { createServer } from "http";
-// const httpServer = createServer();
-// import { Server } from "socket.io"
-// const io = new Server(httpServer, {
-//   cors: {
-//     origin: "http://localhost:3000",
-//     methods: ["GET", "POST"]
-//   }
-// });
 
 import { Server } from "socket.io"
 const io = new Server(socketPort, {
@@ -44,11 +42,18 @@ const io = new Server(socketPort, {
     origin: "http://localhost:3000"
   }
 });
-//httpServer.listen(3002, () => console.log(`Socket Running on Port: http://localhost:${3002}`))
+
 io.on("connection", (socket) => {
   console.log(`Socket Running on Port: http://localhost:${socketPort} ${socket.id}`);
 
   socket.on("sendMessage", (data) => {
     io.emit("getMessage", data);
+  });
+
+  socket.on("deleteMessage", (data) => {
+    io.emit("getDeletedMessage", data);
+  });
+  socket.on("updateMessage", (data) => {
+    io.emit("getUpdateMessage", data);
   });
 });

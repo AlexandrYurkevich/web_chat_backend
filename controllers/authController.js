@@ -6,15 +6,15 @@ const router = express.Router();
 
 export const tryRegister = async (req, res) => {
     try {
-        const salt = await bcrypt.genSalt();
+        const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
         const newUser = new User({
             login: req.body.login,
             password: hashedPassword
         });
-        const userAgain = await User.findOne({ login: req.body.login, password: hashedPassword });
-        userAgain && res.status(400).json("user already exist"); 
+        // const userAgain = await User.findOne({ login: req.body.login, password: hashedPassword });
+        // userAgain && res.status(400).json("user already exist"); 
         const user = await newUser.save();
         res.status(200).json(user);
     } catch (err) {
@@ -25,8 +25,16 @@ export const tryRegister = async (req, res) => {
 
 export const tryLogin = async (req, res) => {
     try {
-        const user = await User.findOne({ login: req.body.login, password: req.body.password });
-        !user && res.status(404).json("user not found");  
+        console.log(req.body.login + ", " + req.body.password);
+        const user = await User.findOne({ login: req.body.login });
+        if(!user){
+            return res.status(404).json("User not found");
+        }
+
+        const match = await bcrypt.compare(req.body.password, user.password)
+        if(!match){
+            return res.status(400).json("Invalid password")
+        }
         res.status(200).json(user)
     } catch (err) {
         res.status(500).json(err)
