@@ -28,12 +28,12 @@ export const tryLogin = async (req, res) => {
         console.log(req.body.login + ", " + req.body.password);
         const user = await User.findOne({ login: req.body.login });
         if(!user){
-            return res.status(404).json("User not found");
+            return res.status(404).json({message: "User not found"});
         }
 
         const match = await bcrypt.compare(req.body.password, user.password)
         if(!match){
-            return res.status(400).json("Invalid password")
+            return res.status(400).json({message: "Invalid password"})
         }
         res.status(200).json(user)
     } catch (err) {
