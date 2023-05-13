@@ -12,14 +12,12 @@ export const tryRegister = async (req, res) => {
         const newUser = new User({
             login: req.body.login,
             password: hashedPassword
-        });
-        // const userAgain = await User.findOne({ login: req.body.login, password: hashedPassword });
-        // userAgain && res.status(400).json("user already exist"); 
+        }); 
         const user = await newUser.save();
         res.status(200).json(user);
     } catch (err) {
         console.log(err)
-        res.status(500).json(err)
+        res.status(500).json({message: "user already exist"})
     }
 };
 

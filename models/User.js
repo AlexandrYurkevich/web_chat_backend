@@ -12,7 +12,7 @@ const userSchema = mongoose.Schema(
             required: true
         }
     },
-    { timestamps: true } //createdAt,updatedAt
+    { timestamps: true }
 )
 
 const User = mongoose.model('User', userSchema)
